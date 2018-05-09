@@ -245,15 +245,15 @@ class GLWidget(QGLWidget):
             #print("Z rot: " + str(self.zRot))
 
     def texture_from_png(self, filename, gen_mipmap=True):
-        mode_to_bpp = {'1':1, 'L':8, 'P':8, 'RGB':24, 'RGBA':32, 'CMYK':32, 'YCbCr':24, 'I':32, 'F':32}
-
         img = open(filename)
         img = img.transpose(FLIP_TOP_BOTTOM)
-        bpp = mode_to_bpp[img.mode]
-        if bpp == 32:
+        if (img.mode in ('RGBA', 'LA') or
+            (img.mode == 'P' and 'transparency' in img.info)):
             type = GL_RGBA
+            img = img.convert(mode='RGBA')
         else:
             type = GL_RGB
+            img = img.convert(mode='RGB')
         img_data = numpy.array(list(img.getdata()), numpy.uint8)
 
         texture = glGenTextures(1)
